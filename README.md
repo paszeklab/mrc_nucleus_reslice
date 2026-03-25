@@ -12,7 +12,8 @@ A Jupyter notebook for batch reslicing cryo-electron microscopy (cryo-EM) image 
 - **Point skipping** — any point can be skipped entirely from the parallel-planes dialog; the spreadsheet row is marked `skipped` automatically.
 - **Automatic normal computation** — SVD-based best-fit normal from three orthogonal 2-D tangent vectors (or cross-product when one plane is parallel); condition number reported as a quality indicator.
 - **Three resliced outputs per point** — along the surface normal (n̂), and along both in-plane tangent vectors (û, v̂).
-- **Batch processing** — list of surface points supplied via an Excel spreadsheet; progress written back to the spreadsheet automatically.
+- **Batch processing** — list of surface points supplied via an Excel spreadsheet; progress written back to the spreadsheet automatically. Points whose status column is non-blank (`done`, `skipped`, `error`) are automatically skipped on re-run — only blank-status rows are processed.
+- **Tangent redo** — right-click or double-click anywhere in a tangent-picker window to clear all placed points and start over.
 - **Live progress bar** — elapsed time and ETA displayed during reslicing.
 - **Text report** — normal vector components, polar angles, tangent vectors, and SVD values saved as a plain-text file for each point.
 
@@ -98,7 +99,7 @@ For each point in the spreadsheet, Cell 6:
 
 1. Extracts XY, XZ, and YZ orthogonal slices and shows them in a reference pop-up (non-blocking).
 2. Opens a **parallel-planes dialog** alongside the reference window. Toggle any plane buttons that are parallel to the membrane (they turn green), or click **Skip this point entirely** to bypass it. Click **Proceed to tangent picking** — the reference window closes automatically.
-3. Opens sequential tangent-picker pop-ups for the non-parallel planes only (XY → XZ → YZ). Left-click two points along the nuclear envelope. Right-click to redo. Use the toolbar zoom/pan tools to navigate, then deactivate them before clicking tangent points.
+3. Opens sequential tangent-picker pop-ups for the non-parallel planes only (XY → XZ → YZ). Left-click two points along the nuclear envelope. Right-click or double-click to clear and redo. Use the toolbar zoom/pan tools to navigate, then deactivate them before clicking tangent points.
 4. Computes the surface normal via SVD (3 tangents) or cross-product (2 tangents) and saves a text report.
 5. Reslices the volume along n̂, û, and v̂ using subvolume cropping and trilinear interpolation.
 6. Saves three MRC files and marks the spreadsheet row as `done`.
