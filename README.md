@@ -8,7 +8,9 @@ A Jupyter notebook for batch reslicing cryo-electron microscopy (cryo-EM) image 
 
 - **Memory-efficient MRC access** — uses memory-mapping and crops a minimal subvolume into RAM; the full volume is never loaded.
 - **Interactive tangent picking** — full-size pop-up windows with zoom/pan toolbar for precise placement of tangent lines on the nuclear envelope.
-- **Automatic normal computation** — SVD-based best-fit normal from three orthogonal 2-D tangent vectors; condition number reported as a quality indicator.
+- **Parallel-plane handling** — if the nuclear envelope runs parallel to one of the orthogonal planes, a dialog lets you flag it and skip that plane; the normal is computed from the remaining two tangents via cross-product.
+- **Point skipping** — any point can be skipped entirely from the parallel-planes dialog; the spreadsheet row is marked `skipped` automatically.
+- **Automatic normal computation** — SVD-based best-fit normal from three orthogonal 2-D tangent vectors (or cross-product when one plane is parallel); condition number reported as a quality indicator.
 - **Three resliced outputs per point** — along the surface normal (n̂), and along both in-plane tangent vectors (û, v̂).
 - **Batch processing** — list of surface points supplied via an Excel spreadsheet; progress written back to the spreadsheet automatically.
 - **Live progress bar** — elapsed time and ETA displayed during reslicing.
@@ -19,7 +21,7 @@ A Jupyter notebook for batch reslicing cryo-electron microscopy (cryo-EM) image 
 ## Repository contents
 
 ```
-mrc_normal_reslice_V8.ipynb       Main notebook (batch workflow)
+mrc_normal_reslice_V9.ipynb       Main notebook (batch workflow)
 surface_points_template.xlsx      Template spreadsheet for batch input
 MRC_Reslice_User_Guide.docx       End-user instruction sheet
 requirements.txt                  Python dependencies
@@ -55,7 +57,7 @@ One of the following must be installed:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/YOUR_USERNAME/mrc_nucleus_reslice.git
+   git clone https://github.com/paszeklab/mrc_nucleus_reslice.git
    cd mrc_nucleus_reslice
    ```
 
@@ -67,12 +69,12 @@ One of the following must be installed:
 
 3. **Fill in the spreadsheet**
 
-   Open `surface_points_template.xlsx` and enter the voxel coordinates (Z, Y, X) of each point on the nuclear surface you want to process. See the *Instructions* sheet inside the spreadsheet for column definitions.
+   Open `surface_points_template.xlsx` and enter the voxel coordinates (Z, Y, X) of each point on the nuclear surface. See the *Instructions* sheet inside the spreadsheet for column definitions.
 
 4. **Open the notebook**
 
    ```bash
-   jupyter lab mrc_normal_reslice_V8.ipynb
+   jupyter lab mrc_normal_reslice_V9.ipynb
    ```
 
 5. **Edit Cell 2** — set `MRC_PATH` to your MRC file and `POINTS_XLSX` to your filled-in spreadsheet.
@@ -94,11 +96,12 @@ Cell 6  →  Batch loop (interactive tangent picking + reslicing)
 
 For each point in the spreadsheet, Cell 6:
 
-1. Extracts XY, XZ, and YZ orthogonal slices and shows them in a reference pop-up.
-2. Opens three sequential tangent-picker pop-ups (XY → XZ → YZ). In each window, left-click two points along the nuclear envelope to define the tangent line. Right-click to redo. Use the toolbar zoom/pan tools to navigate, then deactivate them before clicking tangent points.
-3. Computes the surface normal via SVD and saves a text report.
-4. Reslices the volume along n̂, û, and v̂ using subvolume cropping and trilinear interpolation.
-5. Saves three MRC files and marks the spreadsheet row as `done`.
+1. Extracts XY, XZ, and YZ orthogonal slices and shows them in a reference pop-up (non-blocking).
+2. Opens a **parallel-planes dialog** alongside the reference window. Toggle any plane buttons that are parallel to the membrane (they turn green), or click **Skip this point entirely** to bypass it. Click **Proceed to tangent picking** — the reference window closes automatically.
+3. Opens sequential tangent-picker pop-ups for the non-parallel planes only (XY → XZ → YZ). Left-click two points along the nuclear envelope. Right-click to redo. Use the toolbar zoom/pan tools to navigate, then deactivate them before clicking tangent points.
+4. Computes the surface normal via SVD (3 tangents) or cross-product (2 tangents) and saves a text report.
+5. Reslices the volume along n̂, û, and v̂ using subvolume cropping and trilinear interpolation.
+6. Saves three MRC files and marks the spreadsheet row as `done`.
 
 Points already marked `done` in the spreadsheet are automatically skipped when Cell 6 is re-run.
 
