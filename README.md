@@ -13,6 +13,7 @@ A Jupyter notebook for batch reslicing cryo-electron microscopy (cryo-EM) image 
 - **Automatic normal computation** — SVD-based best-fit normal from three orthogonal 2-D tangent vectors (or cross-product when one plane is parallel); condition number reported as a quality indicator.
 - **Three resliced outputs per point** — along the surface normal (n̂), and along both in-plane tangent vectors (û, v̂).
 - **Batch processing** — list of surface points supplied via an Excel spreadsheet; progress written back to the spreadsheet automatically. Points whose status column is non-blank (`done`, `skipped`, `error`) are automatically skipped on re-run — only blank-status rows are processed.
+- **Reference PNG export** — for each point, four annotated PNG images are saved alongside the TIFFs: one per orthogonal plane and one combined overview, all with red crosshairs marking the selected surface point.
 - **Tangent redo** — right-click or double-click anywhere in a tangent-picker window to clear all placed points and start over.
 - **Live progress bar** — elapsed time and ETA displayed during reslicing.
 - **Text report** — normal vector components, polar angles, tangent vectors, and SVD values saved as a plain-text file for each point.
@@ -118,7 +119,7 @@ For each point with identifier `XX`:
 | `resliced_tangent_u_XX.mrc` | Stack resliced along the first tangent vector (û) |
 | `resliced_tangent_v_XX.mrc` | Stack resliced along the second tangent vector (v̂) |
 | `normal_vector_XX.txt` | Text report: point coordinates, tangent vectors, SVD values, normal vector, polar angles |
-| `ortho_slices/point_XX/` | XY, XZ, YZ reference TIFFs (if `SAVE_ORTHO_TIFFS = True`) |
+| `ortho_slices/point_XX/` | XY, XZ, YZ reference TIFFs; plus four reference PNGs with red crosshairs marking the surface point (three individual planes + one combined overview) (if `SAVE_ORTHO_TIFFS = True`) |
 
 All MRC files embed the full geometry (origin, n̂, û, v̂) as label strings in the file header.
 
